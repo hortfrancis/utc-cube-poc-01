@@ -27,7 +27,7 @@
 .cube-face {
   backface-visibility: visible;
   transform-origin: center;
-  font-size: calc(var(--cube-size) / 10);
+  font-size: calc(var(--cube-size) / 8);
   color: black;
 }
 
