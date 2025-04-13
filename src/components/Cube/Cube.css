@@ -1,0 +1,77 @@
+:root {
+  --cube-size: 20vw;
+  --cube-half: calc(var(--cube-size) / 2);
+}
+
+.scene {
+  width: var(--cube-size);
+  height: var(--cube-size);
+  perspective: 1000px;
+}
+
+@keyframes spinBottom {
+  from {
+    transform: rotateX(-33deg) rotateY(0deg);
+  }
+  to {
+    transform: rotateX(-33deg) rotateY(360deg);
+  }
+}
+
+.cube {
+  transform-style: preserve-3d;
+  animation: spinBottom 10s linear infinite;
+  /* font-size: 20%; */
+}
+
+.cube-face {
+  backface-visibility: visible;
+  transform-origin: center;
+  font-size: calc(var(--cube-size) / 10);
+  color: black;
+}
+
+.cube-face.front {
+  transform: translateZ(var(--cube-half));
+}
+
+.cube-face.back {
+  transform: translateZ(calc(var(--cube-half) * -1)) rotateY(180deg);
+}
+
+.cube-face.right {
+  transform: translateX(var(--cube-half)) rotateY(90deg);
+}
+
+.cube-face.left {
+  transform: translateX(calc(var(--cube-half) * -1)) rotateY(-90deg);
+}
+
+.cube-face.top {
+  transform: translateY(calc(var(--cube-half) * -1)) rotateX(90deg);
+}
+
+.cube-face.bottom {
+  transform: translateY(var(--cube-half)) rotateX(-90deg);
+}
+
+/* Responsive adjustments for different screen sizes */
+@media (max-width: 768px) {
+  :root {
+    --cube-size: 150px;
+  }
+  
+  .scene {
+    perspective: 800px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --cube-size: 100px;
+  }
+  
+  .scene {
+    perspective: 600px;
+  }
+}
