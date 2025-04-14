@@ -5,14 +5,15 @@ interface NavLinkProps {
   to: string;
   children: React.ReactNode;
   isActive?: boolean;
+  className?: string;
 }
 
-const NavLink: React.FC<NavLinkProps> = ({ to, children, isActive = false }) => {
+const NavLink: React.FC<NavLinkProps> = ({ to, children, isActive = false, className = '' }) => {
   return (
-    <li className="my-2 md:my-0 md:ml-6 text-center">
+    <li className={`text-right  py-2 ${className}`}>
       <Link 
         to={to} 
-        className="text-gray-800 no-underline hover:text-blue-500 transition-colors"
+        className="text-gray-800 no-underline hover:text-blue-500 transition-colors block"
         style={{ fontVariationSettings: `"wght" ${isActive ? 600 : 400}` }}
       >
         {children}
