@@ -15,39 +15,54 @@ export default function Cube() {
   const cubeRef = useRef<HTMLDivElement>(null)
   const timeoutRef = useRef<number | null>(null)
   const animationFrameRef = useRef<number | null>(null)
-  const animationStartTimeRef = useRef<number | null>(null)
+  const lastTimestampRef = useRef<number>(0)
+  const totalRotationRef = useRef<number>(0)
   
   // Rotation speed factor (lower = slower)
   const ROTATION_SPEED = 0.25
-
-  // Animation duration in milliseconds
-  const ANIMATION_DURATION = 10000 // 10 seconds
+  // Degrees per second for animation
+  const DEGREES_PER_SECOND = 36 // 360 degrees / 10 seconds
 
   // Reset animation after 3 seconds of inactivity
   const resetAnimation = () => {
     setIsTransitioning(true)
+    
+    // Normalize the rotation to the closest multiple of 360
+    const normalizedRotation = totalRotationRef.current % 360
+    const targetRotation = normalizedRotation > 180 ? normalizedRotation - 360 : normalizedRotation
+    
+    // Set the rotation to the normalized value
     setRotationX(-33)
-    setRotationY(0)
+    setRotationY(targetRotation)
+    
+    // Reset the total rotation to match the normalized value
+    totalRotationRef.current = targetRotation
     
     // Wait for transition to complete before starting animation
     timeoutRef.current = window.setTimeout(() => {
       setIsTransitioning(false)
       setIsAnimating(true)
-      animationStartTimeRef.current = Date.now()
+      lastTimestampRef.current = performance.now()
     }, 1000) // Match this with CSS transition duration
   }
 
   // Update rotation during animation
-  const updateAnimationRotation = () => {
-    if (!isAnimating || animationStartTimeRef.current === null) return
+  const updateAnimationRotation = (timestamp: number) => {
+    if (!isAnimating) return
     
-    const elapsedTime = Date.now() - animationStartTimeRef.current
-    const progress = (elapsedTime % ANIMATION_DURATION) / ANIMATION_DURATION
+    // Calculate time elapsed since last frame
+    const elapsedTime = timestamp - lastTimestampRef.current
+    lastTimestampRef.current = timestamp
     
-    // Calculate rotation based on animation progress
-    // This matches the CSS animation: rotateX(-33deg) rotateY(0deg) to rotateX(-33deg) rotateY(360deg)
+    // Calculate rotation increment based on elapsed time
+    const rotationIncrement = (DEGREES_PER_SECOND * elapsedTime) / 1000
+    
+    // Update total rotation
+    totalRotationRef.current += rotationIncrement
+    
+    // Apply rotation
     setRotationX(-33)
-    setRotationY(progress * 360)
+    setRotationY(totalRotationRef.current)
     
     // Continue animation
     animationFrameRef.current = requestAnimationFrame(updateAnimationRotation)
@@ -56,7 +71,7 @@ export default function Cube() {
   // Start animation when isAnimating becomes true
   useEffect(() => {
     if (isAnimating) {
-      animationStartTimeRef.current = Date.now()
+      lastTimestampRef.current = performance.now()
       animationFrameRef.current = requestAnimationFrame(updateAnimationRotation)
     } else {
       if (animationFrameRef.current) {
@@ -96,8 +111,12 @@ export default function Cube() {
     const deltaX = e.clientX - startX
     const deltaY = e.clientY - startY
     
-    setRotationY(initialRotationY + deltaX * ROTATION_SPEED)
+    const newRotationY = initialRotationY + deltaX * ROTATION_SPEED
+    setRotationY(newRotationY)
     setRotationX(initialRotationX - deltaY * ROTATION_SPEED)
+    
+    // Update total rotation to match the current rotation
+    totalRotationRef.current = newRotationY
   }
 
   // Handle mouse up event
