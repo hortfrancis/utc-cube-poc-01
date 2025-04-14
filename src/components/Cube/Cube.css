@@ -21,19 +21,14 @@
   perspective: 1000px;
 }
 
-@keyframes spinBottom {
-  from {
-    transform: rotateX(-33deg) rotateY(0deg);
-  }
-  to {
-    transform: rotateX(-33deg) rotateY(360deg);
-  }
-}
-
 .cube {
   transform-style: preserve-3d;
-  animation: spinBottom 10s linear infinite;
+  transition: transform 0.1s ease-out;
   /* font-size: 20%; */
+}
+
+.cube.transitioning {
+  transition: transform 1s ease-in-out;
 }
 
 .cube-face {

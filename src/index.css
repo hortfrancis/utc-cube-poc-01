@@ -11,3 +11,8 @@
 body {
   font-family: "Recursive", sans-serif;
 }
+
+.logo {
+  font-variation-settings: "MONO" 0.2, "CASL" 0.2, "wght" 900, "slnt" -2,
+    "CRSV" 1;
+}
