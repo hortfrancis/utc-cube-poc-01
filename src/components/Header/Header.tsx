@@ -30,9 +30,9 @@ const Header: React.FC = () => {
   }, [isMenuOpen]);
 
   return (
-    <header ref={headerRef} className="flex flex-col min-[1100px]:flex-row justify-between items-center min-[1100px]:gap-4 p-8 min-[1100px]:px-8 min-[1100px]:py-4 bg-white shadow-md fixed w-full top-0 z-50">
+    <header ref={headerRef} className="flex flex-col min-[1100px]:flex-row justify-between items-center min-[1100px]:gap-4 p-8 min-[1100px]:px-8 min-[1100px]:py-4 border-b border-b-[#FBB006] border-b-2 fixed w-full top-0 z-50">
       <div className="flex justify-between items-center gap-4 w-full ">
-        <Link to="/" className="logo text-2xl min-[1100px]:text-1xl text-gray-800 no-underline" >
+        <Link to="/" className="logo text-2xl min-[1100px]:text-1xl text-[#443BFF] no-underline" >
           Urban Tech Creative
         </Link>
         {/* Main navigation - visible on small screens but hidden on very small and large screens */}

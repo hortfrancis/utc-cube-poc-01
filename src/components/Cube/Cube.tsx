@@ -173,23 +173,23 @@ export default function Cube() {
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
       >
-        <CubeFace colour="rgb(234 179 8)" className="top">
+        <CubeFace backgroundColour="#3c10ff" textColour="#d1edf3" className="top">
           Augmented <br /> Reality
         </CubeFace>
-        <CubeFace colour="rgb(59 130 246)" className="front">
+        <CubeFace backgroundColour="#ffc109" textColour="#ff0974" className="front">
           Smart Cities
         </CubeFace>
-        <CubeFace colour="rgb(239 68 68)" className="left">
+        <CubeFace backgroundColour="#FF0000" textColour="#fff" className="left">
           Pop-Up
         </CubeFace>
-        <CubeFace colour="rgb(168 85 247)" className="right">
+        <CubeFace backgroundColour="#32CD32" textColour="#0000FF" className="right">
           Construction
         </CubeFace>
-        <CubeFace colour="rgb(34 197 94)" className="back">
+        <CubeFace backgroundColour="#d9f40e" textColour="#ca00cd" className="back">
           Heritage
         </CubeFace>
-        <CubeFace colour="rgb(249 115 22)" className="bottom">
-          🙂
+        <CubeFace backgroundColour="#FFFFFF" textColour="#333333" className="bottom">
+          <span className="text-default">🙂</span>
         </CubeFace>
       </div>
     </div>

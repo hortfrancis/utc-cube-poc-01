@@ -8,11 +8,45 @@
   font-display: swap;
 }
 
+:root {
+  --color-primary: #443AFF;
+  --color-offset: #FBB106;
+  --color-default: #002031;
+  --color-muted: #F5F5F2;
+}
+
 body {
   font-family: "Recursive", sans-serif;
+  color: var(--color-default);
+  background-color: var(--color-muted);
 }
 
 .logo {
   font-variation-settings: "MONO" 0.2, "CASL" 0.2, "wght" 900, "slnt" -2,
     "CRSV" 1;
+}
+
+/* Base color utility classes */
+.text-primary {
+  color: var(--color-primary);
+}
+
+.bg-primary {
+  background-color: var(--color-primary);
+}
+
+.text-offset {
+  color: var(--color-offset);
+}
+
+.bg-offset {
+  background-color: var(--color-offset);
+}
+
+.text-default {
+  color: var(--color-default);
+}
+
+.bg-default {
+  background-color: var(--color-default);
 }
