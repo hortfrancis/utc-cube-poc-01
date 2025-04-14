@@ -1,6 +1,14 @@
 import './Cube.css'
 import { useState, useEffect, useRef } from 'react'
 import CubeFace from './CubeFace'
+import CubeInfoCard from './CubeInfoCard'
+
+// Define the type for the content
+type ContentType = {
+  title: string;
+  description: string;
+  link: string;
+};
 
 export default function Cube() {
   const [isAnimating, setIsAnimating] = useState(true)
@@ -12,12 +20,13 @@ export default function Cube() {
   const [initialRotationX, setInitialRotationX] = useState(-33)
   const [initialRotationY, setInitialRotationY] = useState(0)
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const [selectedFace, setSelectedFace] = useState<ContentType | null>(null)
   const cubeRef = useRef<HTMLDivElement>(null)
   const timeoutRef = useRef<number | null>(null)
   const animationFrameRef = useRef<number | null>(null)
   const lastTimestampRef = useRef<number>(0)
   const totalRotationRef = useRef<number>(0)
-  
+
   // Rotation speed factor (lower = slower)
   const ROTATION_SPEED = 0.25
   // Degrees per second for animation
@@ -26,18 +35,18 @@ export default function Cube() {
   // Reset animation after 3 seconds of inactivity
   const resetAnimation = () => {
     setIsTransitioning(true)
-    
+
     // Normalize the rotation to the closest multiple of 360
     const normalizedRotation = totalRotationRef.current % 360
     const targetRotation = normalizedRotation > 180 ? normalizedRotation - 360 : normalizedRotation
-    
+
     // Set the rotation to the normalized value
     setRotationX(-33)
     setRotationY(targetRotation)
-    
+
     // Reset the total rotation to match the normalized value
     totalRotationRef.current = targetRotation
-    
+
     // Wait for transition to complete before starting animation
     timeoutRef.current = window.setTimeout(() => {
       setIsTransitioning(false)
@@ -49,21 +58,21 @@ export default function Cube() {
   // Update rotation during animation
   const updateAnimationRotation = (timestamp: number) => {
     if (!isAnimating) return
-    
+
     // Calculate time elapsed since last frame
     const elapsedTime = timestamp - lastTimestampRef.current
     lastTimestampRef.current = timestamp
-    
+
     // Calculate rotation increment based on elapsed time
     const rotationIncrement = (DEGREES_PER_SECOND * elapsedTime) / 1000
-    
+
     // Update total rotation
     totalRotationRef.current += rotationIncrement
-    
+
     // Apply rotation
     setRotationX(-33)
     setRotationY(totalRotationRef.current)
-    
+
     // Continue animation
     animationFrameRef.current = requestAnimationFrame(updateAnimationRotation)
   }
@@ -78,7 +87,7 @@ export default function Cube() {
         cancelAnimationFrame(animationFrameRef.current)
       }
     }
-    
+
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
@@ -93,7 +102,7 @@ export default function Cube() {
     setIsTransitioning(false)
     setStartX(e.clientX)
     setStartY(e.clientY)
-    
+
     // Use current rotation values as initial values for manual control
     setInitialRotationX(rotationX)
     setInitialRotationY(rotationY)
@@ -107,14 +116,14 @@ export default function Cube() {
   // Handle mouse move event
   const handleMouseMove = (e: MouseEvent | React.MouseEvent) => {
     if (!isDragging) return
-    
+
     const deltaX = e.clientX - startX
     const deltaY = e.clientY - startY
-    
+
     const newRotationY = initialRotationY + deltaX * ROTATION_SPEED
     setRotationY(newRotationY)
     setRotationX(initialRotationX - deltaY * ROTATION_SPEED)
-    
+
     // Update total rotation to match the current rotation
     totalRotationRef.current = newRotationY
   }
@@ -122,12 +131,12 @@ export default function Cube() {
   // Handle mouse up event
   const handleMouseUp = () => {
     setIsDragging(false)
-    
+
     // Clear any existing timeout
     if (timeoutRef.current) {
       window.clearTimeout(timeoutRef.current)
     }
-    
+
     // Set new timeout to reset animation
     timeoutRef.current = window.setTimeout(resetAnimation, 3000)
   }
@@ -160,12 +169,45 @@ export default function Cube() {
     }
   }, [isDragging])
 
+  const categoryContent = {
+    augmentedReality: {
+      title: "Augmented Reality",
+      description: "Explore immersive AR experiences that transform public spaces.",
+      link: "/augmented-reality"
+    },
+    smartCities: {
+      title: "Smart Cities",
+      description: "Engage communities with live data and digital overlays using Urban AR.",
+      link: "/smart-cities"
+    },
+    construction: {
+      title: "Construction",
+      description: "Use Construct.AR to improve site coordination, safety, and design insight.",
+      link: "/construction"
+    },
+    popUp: {
+      title: "Pop-up Spaces",
+      description: "Reimagine retail with phygital showcases and immersive brand activations.",
+      link: "/pop-up"
+    },
+    heritage: {
+      title: "Heritage",
+      description: "Bring the past to life with cinematic storytelling and digital reconstructions.",
+      link: "/heritage"
+    }
+  }
+
+  // Function to handle face click and set selected face
+  const handleFaceClick = (content: ContentType) => {
+    setSelectedFace(content)
+  }
+
   return (
     <div className="scene">
       <div
         ref={cubeRef}
         className={`cube relative w-full h-full select-none ${isTransitioning ? 'transitioning' : ''}`}
-        style={{ 
+        style={{
           transform: `rotateX(${rotationX}deg) rotateY(${rotationY}deg)`,
           cursor: isDragging ? 'grabbing' : 'grab'
         }}
@@ -173,25 +215,35 @@ export default function Cube() {
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
       >
-        <CubeFace backgroundColour="#3c10ff" textColour="#d1edf3" className="top">
+        <CubeFace backgroundColour="#8A2BE2" textColour="#FFFFFF" className="top" onClick={() => handleFaceClick(categoryContent.augmentedReality)}>
           Augmented <br /> Reality
         </CubeFace>
-        <CubeFace backgroundColour="#ffc109" textColour="#ff0974" className="front">
+        <CubeFace backgroundColour="#FF6F61" textColour="#8A2BE2" className="front" onClick={() => handleFaceClick(categoryContent.smartCities)}>
           Smart Cities
         </CubeFace>
-        <CubeFace backgroundColour="#FF0000" textColour="#fff" className="left">
+        <CubeFace backgroundColour="#FF0000" textColour="#ADD8E6" className="left" onClick={() => handleFaceClick(categoryContent.popUp)}>
           Pop-Up
         </CubeFace>
-        <CubeFace backgroundColour="#32CD32" textColour="#0000FF" className="right">
+        <CubeFace backgroundColour="#32CD32" textColour="#0000FF" className="right" onClick={() => handleFaceClick(categoryContent.construction)}>
           Construction
         </CubeFace>
-        <CubeFace backgroundColour="#d9f40e" textColour="#ca00cd" className="back">
+        <CubeFace backgroundColour="#FFD700" textColour="#8A2BE2" className="back" onClick={() => handleFaceClick(categoryContent.heritage)}>
           Heritage
         </CubeFace>
-        <CubeFace backgroundColour="#FFFFFF" textColour="#333333" className="bottom">
+        <CubeFace backgroundColour="#FFFFFF" textColour="#333333" className="bottom" onClick={() => handleFaceClick({ title: "About", description: "Learn more about us.", link: "/about" })}>
           <span className="text-default">🙂</span>
         </CubeFace>
       </div>
+
+      {/* Use the CubeInfoCard component for displaying content */}
+      {selectedFace && (
+        <CubeInfoCard 
+          title={selectedFace.title} 
+          description={selectedFace.description} 
+          link={selectedFace.link} 
+          onClose={() => setSelectedFace(null)} 
+        />
+      )}
     </div>
   )
 }
