@@ -141,6 +141,55 @@ export default function Cube() {
     timeoutRef.current = window.setTimeout(resetAnimation, 3000)
   }
 
+  // Handle touch start event
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsDragging(true)
+    setIsAnimating(false)
+    setIsTransitioning(false)
+    setStartX(e.touches[0].clientX)
+    setStartY(e.touches[0].clientY)
+
+    // Use current rotation values as initial values for manual control
+    setInitialRotationX(rotationX)
+    setInitialRotationY(rotationY)
+
+    // Clear any existing timeout
+    if (timeoutRef.current) {
+      window.clearTimeout(timeoutRef.current)
+    }
+  }
+
+  // Handle touch move event
+  const handleTouchMove = (e: TouchEvent | React.TouchEvent) => {
+    if (!isDragging) return
+
+    // Prevent default to avoid scrolling while rotating the cube
+    e.preventDefault()
+
+    const deltaX = e.touches[0].clientX - startX
+    const deltaY = e.touches[0].clientY - startY
+
+    const newRotationY = initialRotationY + deltaX * ROTATION_SPEED
+    setRotationY(newRotationY)
+    setRotationX(initialRotationX - deltaY * ROTATION_SPEED)
+
+    // Update total rotation to match the current rotation
+    totalRotationRef.current = newRotationY
+  }
+
+  // Handle touch end event
+  const handleTouchEnd = () => {
+    setIsDragging(false)
+
+    // Clear any existing timeout
+    if (timeoutRef.current) {
+      window.clearTimeout(timeoutRef.current)
+    }
+
+    // Set new timeout to reset animation
+    timeoutRef.current = window.setTimeout(resetAnimation, 3000)
+  }
+
   // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
@@ -158,14 +207,20 @@ export default function Cube() {
     if (isDragging) {
       window.addEventListener('mousemove', handleMouseMove)
       window.addEventListener('mouseup', handleMouseUp)
+      window.addEventListener('touchmove', handleTouchMove, { passive: false })
+      window.addEventListener('touchend', handleTouchEnd)
     } else {
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('mouseup', handleMouseUp)
+      window.removeEventListener('touchmove', handleTouchMove)
+      window.removeEventListener('touchend', handleTouchEnd)
     }
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('mouseup', handleMouseUp)
+      window.removeEventListener('touchmove', handleTouchMove)
+      window.removeEventListener('touchend', handleTouchEnd)
     }
   }, [isDragging])
 
@@ -203,47 +258,50 @@ export default function Cube() {
   }
 
   return (
-    <div className="scene">
-      <div
-        ref={cubeRef}
-        className={`cube relative w-full h-full select-none ${isTransitioning ? 'transitioning' : ''}`}
-        style={{
-          transform: `rotateX(${rotationX}deg) rotateY(${rotationY}deg)`,
-          cursor: isDragging ? 'grabbing' : 'grab'
-        }}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-      >
-        <CubeFace backgroundColour="#8A2BE2" textColour="#FFFFFF" className="top" onClick={() => handleFaceClick(categoryContent.augmentedReality)}>
-          Augmented <br /> Reality
-        </CubeFace>
-        <CubeFace backgroundColour="#FF6F61" textColour="#8A2BE2" className="front" onClick={() => handleFaceClick(categoryContent.smartCities)}>
-          Smart Cities
-        </CubeFace>
-        <CubeFace backgroundColour="#FF0000" textColour="#ADD8E6" className="left" onClick={() => handleFaceClick(categoryContent.popUp)}>
-          Pop-Up
-        </CubeFace>
-        <CubeFace backgroundColour="#32CD32" textColour="#0000FF" className="right" onClick={() => handleFaceClick(categoryContent.construction)}>
-          Construction
-        </CubeFace>
-        <CubeFace backgroundColour="#FFD700" textColour="#8A2BE2" className="back" onClick={() => handleFaceClick(categoryContent.heritage)}>
-          Heritage
-        </CubeFace>
-        <CubeFace backgroundColour="#FFFFFF" textColour="#333333" className="bottom" onClick={() => handleFaceClick({ title: "About", description: "Learn more about us.", link: "/about" })}>
-          <span className="text-default">🙂</span>
-        </CubeFace>
-      </div>
+    <>
+      <div className="scene">
+        <div
+          ref={cubeRef}
+          className={`cube relative w-full h-full select-none ${isTransitioning ? 'transitioning' : ''}`}
+          style={{
+            transform: `rotateX(${rotationX}deg) rotateY(${rotationY}deg)`,
+            cursor: isDragging ? 'grabbing' : 'grab'
+          }}
+          onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+        >
+          <CubeFace backgroundColour="#8A2BE2" textColour="#FFFFFF" className="top" onClick={() => handleFaceClick(categoryContent.augmentedReality)}>
+            Augmented <br /> Reality
+          </CubeFace>
+          <CubeFace backgroundColour="#FF6F61" textColour="#8A2BE2" className="front" onClick={() => handleFaceClick(categoryContent.smartCities)}>
+            Smart Cities
+          </CubeFace>
+          <CubeFace backgroundColour="#FF0000" textColour="#ADD8E6" className="left" onClick={() => handleFaceClick(categoryContent.popUp)}>
+            Pop-Up
+          </CubeFace>
+          <CubeFace backgroundColour="#32CD32" textColour="#0000FF" className="right" onClick={() => handleFaceClick(categoryContent.construction)}>
+            Construction
+          </CubeFace>
+          <CubeFace backgroundColour="#FFD700" textColour="#8A2BE2" className="back" onClick={() => handleFaceClick(categoryContent.heritage)}>
+            Heritage
+          </CubeFace>
+          <CubeFace backgroundColour="#FFFFFF" textColour="#333333" className="bottom" onClick={() => handleFaceClick({ title: "About", description: "Learn more about us.", link: "/about" })}>
+            <span className="text-default">🙂</span>
+          </CubeFace>
+        </div>
 
+      </div>
       {/* Use the CubeInfoCard component for displaying content */}
       {selectedFace && (
-        <CubeInfoCard 
-          title={selectedFace.title} 
-          description={selectedFace.description} 
-          link={selectedFace.link} 
-          onClose={() => setSelectedFace(null)} 
+        <CubeInfoCard
+          title={selectedFace.title}
+          description={selectedFace.description}
+          link={selectedFace.link}
+          onClose={() => setSelectedFace(null)}
         />
       )}
-    </div>
+    </>
   )
 }

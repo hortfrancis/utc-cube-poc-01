@@ -11,7 +11,7 @@ interface CubeFaceProps {
 export default function CubeFace({ backgroundColour = '#FFFFFF', textColour = '#000000', children, className = '', onClick }: CubeFaceProps) {
   return (
     <div 
-      className={`cube-face ${className} absolute w-full h-full flex items-center justify-center text-white font-bold`}
+      className={`cube-face ${className} absolute w-full h-full flex items-center justify-center text-white font-bold cursor-pointer`}
       style={{ backgroundColor: backgroundColour }}
       onClick={onClick}
     >
